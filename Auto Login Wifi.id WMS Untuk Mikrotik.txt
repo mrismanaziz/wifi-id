@@ -1,0 +1,13 @@
+:if ([/ping address=8.8.8.8 count=2] = 0) do={
+/ip dns cache flush
+/ip dhcp-client release [find interface=wlan1]
+log warning ("NEW DHCP CLIENT")
+delay 10
+log error ("@WMS is down --- trying to reconnect ......")
+:local ip [/ip address get [/ip address find interface="wlan1"] address];
+:local mac [/interface wireless get [ find default-name=wlan1 ] mac-address];
+:local ip [put [:pick $ip 0 [:find $ip "/"]]];
+/tool fetch http-header-field="User-Agent: Mozilla/4.0" http-method=post http-data="username=isiUsernameWMS@freeMS&password=isipwmslonya" url=("https://welcome2.wifi.id/wms/auth/authnew/autologin/quarantine.php?ipc=$ip&gw_id=WAG-D2-JT&mac=$mac&redirect=&wlan=JKTGAN00135-N/TLK-CI-32066:NAMAWIFIWMSNYA@WIFI.ID") keep-result=no;
+} else {
+log warning ("@WMS is UP")
+}
